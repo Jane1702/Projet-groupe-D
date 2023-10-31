@@ -6,7 +6,7 @@ from ConvertisseurNombresRomains import ConvertisseurNombresRomains
 class NombresRomainsTest(unittest.TestCase):
     def test_un(self):
         # ETANT DONNE le chiffre 1
-        nombre_arabe = 2
+        nombre_arabe = 1
 
         # QUAND on le convertit en nombres romains
         nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
