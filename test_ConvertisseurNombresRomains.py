@@ -16,7 +16,7 @@ class NombresRomainsTest(unittest.TestCase):
 
     def test_deux(self):
         # ETANT DONNE le chiffre 2
-        nombre_arabe = 5
+        nombre_arabe = 2
 
         # QUAND on le convertit en nombres romains
         nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
