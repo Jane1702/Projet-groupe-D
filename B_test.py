@@ -1,4 +1,3 @@
-import git
 import subprocess
 
 def run_tests():
@@ -11,24 +10,28 @@ def run_tests():
         return False  # Les tests ont échoué
 
 def create_failure_branch():
-    repo_path = "C:/Users/Thuy-trang/Desktop/Projet-groupe-D"  # Remplacez par le chemin de votre repo
-    repo = git.Repo(repo_path)
+    # Générez un nom de branche unique pour la branche de défaillance
+    failure_branch_name = "failure_branch"
 
-    # Assurez-vous que la branche "failure" n'existe pas déjà
-    if "failure" in repo.branches:
-        print("La branche 'failure' existe déjà.")
-        return
+    # Créez une nouvelle branche
+    subprocess.run(["git", "checkout", "-b", failure_branch_name])
 
-    # Créez la nouvelle branche si les tests ont échoué
+def push_to_dev_branch():
+    # Poussez la branche actuelle vers la branche "dev"
+    subprocess.run(["git", "push", "origin", "HEAD:dev"])
+
+def main():
+    # Exécutez les tests
     if not run_tests():
-        current_branch = repo.active_branch
-        new_branch = repo.create_head("failure", commit=current_branch.commit)
+        print("Les tests ont échoué. Création de la branche de défaillance et push sur la branche dev.")
+        
+        # Créez une branche de défaillance
+        create_failure_branch()
 
-        # Passez à la nouvelle branche
-        repo.head.reference = new_branch
-        repo.head.reset(index=True, working_tree=True)
-
-        print("La branche 'failure' a été créée avec succès.")
+        # Poussez la branche de défaillance sur la branche dev
+        push_to_dev_branch()
+    else:
+        print("Les tests ont réussi. Aucune action nécessaire.")
 
 if __name__ == "__main__":
-    create_failure_branch()
+    main()
