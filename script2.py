@@ -7,6 +7,11 @@ def pull_dev_branch():
     subprocess.run(["git", "pull", "origin", "dev"])
 
 
+def build():
+    # Add your build commands here
+    pass
+
+
 def run_tests():
     # Run your tests here. Adjust the command based on your project.
     try:
@@ -44,13 +49,14 @@ def create_failure_branch():
         subprocess.run(["git", "checkout", failure_branch_name])
 
 
-def fast_forward_to_main():
-    # Fast-forward the dev branch to main
-<<<<<<< HEAD
+def reset_dev_branch():
+    # Reset the dev branch to the previous commit
+    subprocess.run(["git", "reset", "--hard", "HEAD^"])
+
+
+def fast_forward_to_master():
+    # Fast-forward the dev branch to master
     subprocess.run(["git", "checkout", "master"])
-=======
-    subprocess.run(["git", "checkout", "main"])
->>>>>>> a3dbb63e26a37548c40155f40acb175e25806e83
     subprocess.run(["git", "merge", "dev", "--ff-only"])
 
 
@@ -63,6 +69,8 @@ def main():
     # Pull changes from the dev branch
     pull_dev_branch()
 
+    # Build (add your build steps here)
+
     # Run tests
     if not run_tests():
         print(
@@ -72,13 +80,16 @@ def main():
         # Create or switch to the failure branch
         create_failure_branch()
 
+        # Reset dev branch to the previous commit
+        reset_dev_branch()
+
         # Push the failure branch to the dev branch
         push_to_dev_branch()
     else:
-        print("Tests passed. Fast-forwarding to main and pushing changes.")
+        print("Tests passed. Fast-forwarding to master and pushing changes.")
 
-        # Fast-forward the dev branch to main
-        fast_forward_to_main()
+        # Fast-forward the dev branch to master
+        fast_forward_to_master()
 
         # Push changes to the dev branch
         push_to_dev_branch()
