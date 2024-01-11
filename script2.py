@@ -46,7 +46,11 @@ def create_failure_branch():
 
 def fast_forward_to_main():
     # Fast-forward the dev branch to main
+<<<<<<< HEAD
     subprocess.run(["git", "checkout", "master"])
+=======
+    subprocess.run(["git", "checkout", "main"])
+>>>>>>> a3dbb63e26a37548c40155f40acb175e25806e83
     subprocess.run(["git", "merge", "dev", "--ff-only"])
 
 

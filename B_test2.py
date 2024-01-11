@@ -14,6 +14,14 @@ def run_tests():
     except subprocess.CalledProcessError as e:
         print(f"Les tests ont échoué:\n{e.output}")
         return False  # Les tests ont échoué
+    
+def create_failure_branch(commit_hash):
+    # Générez un nom de branche unique pour la branche de défaillance avec le numéro de commit
+    failure_branch_name = f"failure_branch_{commit_hash}"
+
+    # Créez une nouvelle branche
+    subprocess.run(["git", "checkout", "-b", failure_branch_name])
+    
 def push_to_dev_branch():
     # Poussez la branche actuelle vers la branche "dev"
     subprocess.run(["git", "push", "origin", "HEAD:dev"])
