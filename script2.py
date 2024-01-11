@@ -1,81 +1,84 @@
-# test_convertisseur.py
-import unittest
 import subprocess
-from ConvertisseurNombresRomains import ConvertisseurNombresRomains
-from parameterized import parameterized
+import datetime
 
-"""
-@parameterized.parameterized.expand(
-    [
-        [1],
-        [2],
-        [3],
-    ]
-)
-"""
-class NombresRomainsTest(unittest.TestCase):
-    def test_un(self):
-        # ETANT DONNE le chiffre 1
-        nombre_arabe = 1
 
-        # QUAND on le convertit en nombres romains
-        nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
+def pull_dev_branch():
+    # Pull changes from the dev branch
+    subprocess.run(["git", "pull", "origin", "dev"])
 
-        # ALORS on obtient "I"
-        self.assertEqual("I", nombre_romain)
 
-        # If the test passes, push to GitHub
-        self.git_push()
+def run_tests():
+    # Run your tests here. Adjust the command based on your project.
+    try:
+        subprocess.check_output(
+            ["python", "tests.py"], stderr=subprocess.STDOUT, universal_newlines=True
+        )
+        return True  # Tests passed
+    except subprocess.CalledProcessError as e:
+        print(f"Tests failed:\n{e.output}")
+        return False  # Tests failed
 
-    def test_deux(self):
-        # ETANT DONNE le chiffre 2
-        nombre_arabe = 2
 
-        # QUAND on le convertit en nombres romains
-        nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
+def create_failure_branch():
+    # Generate a unique name for the failure branch using timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    failure_branch_name = f"failures/{timestamp}"
 
-        # ALORS on obtient "II"
-        self.assertEqual("II", nombre_romain)
+    # Commit the changes before creating the failure branch
+    subprocess.run(["git", "add", "."])
+    subprocess.run(["git", "commit", "-m", "Commit before failure branch creation"])
 
-        # If the test passes, push to GitHub
-        self.git_push()
+    # Check if the failure branch already exists
+    existing_branch_check = subprocess.run(
+        ["git", "rev-parse", "--verify", failure_branch_name],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
 
-    def test_trois(self):
-        # ETANT DONNE le chiffre 3
-        nombre_arabe = 3
+    if existing_branch_check.returncode != 0:
+        # Create a new failure branch
+        subprocess.run(["git", "checkout", "-b", failure_branch_name])
+    else:
+        # Switch to the existing failure branch
+        subprocess.run(["git", "checkout", failure_branch_name])
 
-        # QUAND on le convertit en nombres romains
-        nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
 
-        # ALORS on obtient "III"
-        self.assertEqual("III", nombre_romain)
+def fast_forward_to_main():
+    # Fast-forward the dev branch to main
+    subprocess.run(["git", "checkout", "main"])
+    subprocess.run(["git", "merge", "dev", "--ff-only"])
 
-        # If the test passes, push to GitHub
-        self.git_push()
 
-    def test_quatre(self):
-        # ETANT DONNE le chiffre 4
-        nombre_arabe = 4
+def push_to_dev_branch():
+    # Push the current branch to the dev branch
+    subprocess.run(["git", "push", "origin", "HEAD:dev"])
 
-        # QUAND on le convertit en nombres romains
-        nombre_romain = ConvertisseurNombresRomains.convertir(nombre_arabe)
 
-        # ALORS on obtient "IV"
-        self.assertEqual("IV", nombre_romain)
+def main():
+    # Pull changes from the dev branch
+    pull_dev_branch()
 
-        # If the test passes, push to GitHub
-        self.git_push()
+    # Run tests
+    if not run_tests():
+        print(
+            "Tests failed. Creating the failure branch and pushing to the dev branch."
+        )
 
-    def git_push(self):
-        try:
-            subprocess.run(["git", "add", "."])
-            subprocess.run(
-                ["git", "commit", "-m", "Automated commit after successful test"]
-            )
-            subprocess.run(["git", "push"])
-        except Exception as e:
-            print(f"Git push failed: {e}")
+        # Create or switch to the failure branch
+        create_failure_branch()
+
+        # Push the failure branch to the dev branch
+        push_to_dev_branch()
+    else:
+        print("Tests passed. Fast-forwarding to main and pushing changes.")
+
+        # Fast-forward the dev branch to main
+        fast_forward_to_main()
+
+        # Push changes to the dev branch
+        push_to_dev_branch()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    main()
